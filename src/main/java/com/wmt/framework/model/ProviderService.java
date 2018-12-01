@@ -25,7 +25,7 @@ public class ProviderService implements Serializable{
     /**
      * 服务端口
      */
-    private String servicePort;
+    private int servicePort;
     /**
      * 服务超时时间
      */
@@ -91,7 +91,7 @@ public class ProviderService implements Serializable{
         return serviceObject;
     }
 
-    public String getServicePort() {
+    public int getServicePort() {
         return servicePort;
     }
 
@@ -127,7 +127,7 @@ public class ProviderService implements Serializable{
         this.serviceObject = serviceObject;
     }
 
-    public void setServicePort(String servicePort) {
+    public void setServicePort(int servicePort) {
         this.servicePort = servicePort;
     }
 

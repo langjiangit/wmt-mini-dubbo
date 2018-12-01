@@ -1,1 +1,2 @@
 # wmt-mini-dubbo
+从零开始仿写了一个mini版本的RPC框架，以便能够对dubbo等RPC框架的工作原理有一个深入的了解
