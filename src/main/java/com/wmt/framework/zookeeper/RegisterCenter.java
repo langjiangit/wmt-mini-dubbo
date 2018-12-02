@@ -11,9 +11,12 @@ import com.wmt.framework.model.ProviderService;
 import org.I0Itec.zkclient.IZkChildListener;
 import org.I0Itec.zkclient.ZkClient;
 import org.I0Itec.zkclient.serialize.SerializableSerializer;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -127,6 +130,114 @@ public class RegisterCenter implements IRegisterCenter4Invoker, IRegisterCenter4
 
     }
 
+    @Override
+    public Map<String, List<ProviderService>> getProviderServiceMap() {
+        return providerServiceMap;
+    }
+
+    @Override
+    public void initProviderMap(String remoteAppKey, String groupName) {
+        if (MapUtils.isEmpty(serviceMetaDataMap4Consume)) {
+            serviceMetaDataMap4Consume.putAll(fetchOrUpdateServiceMetaData(remoteAppKey, groupName));
+        }
+    }
+    @Override
+    public Map<String, List<ProviderService>> getServiceMetaDataMap4Consume() {
+        return null;
+    }
+
+    @Override
+    public void registerInvoker(InvokerService invoker) {
+
+    }
+
+    private Map<String, List<ProviderService>> fetchOrUpdateServiceMetaData(String remoteAppKey, String groupName) {
+        final Map<String, List<ProviderService>> providerServiceMap = Maps.newConcurrentMap();
+        //连接zk
+        synchronized (RegisterCenter.class) {
+            if (zkClient == null) {
+                zkClient = new ZkClient(ZK_SERVICE, ZK_SESSION_TIME_OUT, ZK_SESSION_TIME_OUT, new SerializableSerializer());
+            }
+        }
+        //从ZK获取服务提供者列表
+        String providePath = ROOT_PATH + "/" + remoteAppKey + "/" + groupName;
+        List<String> providerServices = zkClient.getChildren(providePath);
+        for (String serviceName : providerServices) {
+            String servicePath = providePath + "/" + serviceName + "/" + PROVIDER_TYPE;
+            List<String> ipPathList = zkClient.getChildren(servicePath);
+            for (String ipPath : ipPathList) {
+                String serverIp = StringUtils.split(ipPath, "|")[0];
+                String serverPort = StringUtils.split(ipPath, "|")[1];
+                int weight = Integer.parseInt(StringUtils.split(ipPath, "|")[2]);
+                int workerThreads = Integer.parseInt(StringUtils.split(ipPath, "|")[3]);
+                String group = StringUtils.split(ipPath, "|")[4];
+
+                List<ProviderService> providerServiceList = providerServiceMap.get(serviceName);
+                if (providerServiceList == null) {
+                    providerServiceList = Lists.newArrayList();
+                }
+                ProviderService providerService = new ProviderService();
+
+                try {
+                    providerService.setServiceItf(ClassUtils.getClass(serviceName));
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+
+                providerService.setServerIp(serverIp);
+                providerService.setServicePort(Integer.parseInt(serverPort));
+                providerService.setWeight(weight);
+                providerService.setWorkerThreads(workerThreads);
+                providerService.setGroupName(group);
+                providerServiceList.add(providerService);
+
+                providerServiceMap.put(serviceName, providerServiceList);
+            }
+            zkClient.subscribeChildChanges(servicePath, new IZkChildListener() {
+                @Override
+                public void handleChildChange(String parentPath, List<String> currentChilds) throws Exception {
+                    if (currentChilds == null) {
+                        currentChilds = Lists.newArrayList();
+                    }
+                    currentChilds = Lists.newArrayList(Lists.transform(currentChilds, new Function<String, String>() {
+                        @Override
+                        public String apply(String input) {
+                            return StringUtils.split(input, "|")[0];
+                        }
+                    }));
+                    refreshServiceMetaDataMap(currentChilds);
+                }
+            });
+        }
+        return providerServiceMap;
+    }
+
+    private void refreshServiceMetaDataMap(List<String> serviceIpList) {
+        if (serviceIpList == null) {
+            serviceIpList = Lists.newArrayList();
+        }
+
+        Map<String, List<ProviderService>> currentServiceMetaDataMap = Maps.newHashMap();
+        for (Map.Entry<String, List<ProviderService>> entry : serviceMetaDataMap4Consume.entrySet()) {
+            String serviceItfKey = entry.getKey();
+            List<ProviderService> serviceList = entry.getValue();
+
+            List<ProviderService> providerServiceList = currentServiceMetaDataMap.get(serviceItfKey);
+            if (providerServiceList == null) {
+                providerServiceList = new ArrayList<ProviderService>();
+            }
+
+            for (ProviderService serviceMetaData : serviceList) {
+                if (serviceIpList.contains(serviceMetaData.getServerIp())) {
+                    providerServiceList.add(serviceMetaData);
+                }
+            }
+            currentServiceMetaDataMap.put(serviceItfKey, providerServiceList);
+        }
+        serviceMetaDataMap4Consume.clear();
+        serviceMetaDataMap4Consume.putAll(currentServiceMetaDataMap);
+    }
+
     //利用ZK自动刷新当前存活的服务提供者列表数据
     private void refreshActivityService(List<String> serviceIpList) {
         if (serviceIpList == null) {
@@ -154,24 +265,4 @@ public class RegisterCenter implements IRegisterCenter4Invoker, IRegisterCenter4
         providerServiceMap.putAll(currentServiceMetaDataMap);
     }
 
-    @Override
-    public void initProviderMap(String remoteAppKey, String groupName) {
-
-    }
-
-    @Override
-    public Map<String, List<ProviderService>> getServiceMetaDataMap4Consume() {
-        return null;
-    }
-
-    @Override
-    public void registerInvoker(InvokerService invoker) {
-
-    }
-
-
-    @Override
-    public Map<String, List<ProviderService>> getProviderServiceMap() {
-        return null;
-    }
 }
