@@ -10,10 +10,7 @@ import com.wmt.framework.serialization.NettyDecoderHandler;
 import com.wmt.framework.serialization.NettyEncoderHandler;
 import com.wmt.framework.serialization.common.SerializeType;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -27,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Channel 连接池工厂类 针对每个服务提供者地址, 预先生成了一个保存Channel的阻塞队列 实现对Netty的Channel 通道进行复用
@@ -176,6 +174,30 @@ public class NettyChannelPoolFactory {
                             ch.pipeline().addLast(new NettyClientInvokeHandler());
                         }
                     });
+            ChannelFuture channelFuture = bootstrap.connect().sync();
+            final Channel newChannel = channelFuture.channel();
+            final CountDownLatch connectedLatch = new CountDownLatch(1);
+            final List<Boolean>  isSuccessHolder = Lists.newArrayListWithCapacity(1);
+            //监听Channel是否建立成功
+            channelFuture.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    //若Channel建立成功,保存建立成功的标记
+                    if (future.isSuccess()) {
+                        isSuccessHolder.add(Boolean.TRUE);
+                    } else {
+                        //若Channel建立失败,保存建立失败的标记
+                        future.cause().printStackTrace();
+                        isSuccessHolder.add(Boolean.FALSE);
+                    }
+                    connectedLatch.countDown();
+                }
+            });
+            connectedLatch.await();
+            //如果Channel建立成功,返回新建的Channel
+            if (isSuccessHolder.get(0)) {
+                return newChannel;
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -183,6 +205,7 @@ public class NettyChannelPoolFactory {
     }
 
 
-    public static void channelPoolFactoryInstance() {
+    public static NettyChannelPoolFactory channelPoolFactoryInstance() {
+        return channelPoolFactory;
     }
 }
