@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 /**
- * 处理服务端的逻辑
+ * 处理服务端的逻辑  根据解码得到的Java请求对象确定服务提供者的接口以及方法,然后反射发起调用
  * Created by weimiantong on 18/12/1.
  */
 public class NettyServerInvokeHandler extends SimpleChannelInboundHandler<AresRequest> {
@@ -47,8 +47,9 @@ public class NettyServerInvokeHandler extends SimpleChannelInboundHandler<AresRe
 
             //根据方法名称定位到具体某一个服务提供者
             String serviceKey = metaDataModel.getServiceItf().getName();
-            //获取限流工具类
+            //获取配置的服务端工作线程数
             int workerThread = metaDataModel.getWorkerThreads();
+            //获取限流工具类
             Semaphore semaphore = serviceKeySemaphoreMap.get(serviceKey);
             if (semaphore == null) {
                 synchronized (serviceKeySemaphoreMap) {

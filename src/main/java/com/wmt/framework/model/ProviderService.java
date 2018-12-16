@@ -25,7 +25,7 @@ public class ProviderService implements Serializable{
     /**
      * 服务端口
      */
-    private int servicePort;
+    private int serverPort;
     /**
      * 服务超时时间
      */
@@ -57,7 +57,7 @@ public class ProviderService implements Serializable{
         providerService.setServiceObject(serviceObject);
         providerService.setServiceMethod(serviceMethod);
         providerService.setServerIp(serverIp);
-        providerService.setServicePort(servicePort);
+        providerService.setServerPort(serverPort);
         providerService.setTimeout(timeout);
         providerService.setWeight(weight);
         providerService.setWorkerThreads(workerThreads);
@@ -91,8 +91,8 @@ public class ProviderService implements Serializable{
         return serviceObject;
     }
 
-    public int getServicePort() {
-        return servicePort;
+    public int getServerPort() {
+        return serverPort;
     }
 
     public long getTimeout() {
@@ -127,8 +127,8 @@ public class ProviderService implements Serializable{
         this.serviceObject = serviceObject;
     }
 
-    public void setServicePort(int servicePort) {
-        this.servicePort = servicePort;
+    public void setServerPort(int servicePort) {
+        this.serverPort = servicePort;
     }
 
     public void setTimeout(long timeout) {

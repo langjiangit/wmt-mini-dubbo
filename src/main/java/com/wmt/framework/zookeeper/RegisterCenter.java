@@ -95,7 +95,7 @@ public class RegisterCenter implements IRegisterCenter4Invoker, IRegisterCenter4
                 }
 
                 //创建当前服务器节点
-                int serverPort = entry.getValue().get(0).getServicePort();//服务端口
+                int serverPort = entry.getValue().get(0).getServerPort();//服务端口
                 int weight = entry.getValue().get(0).getWeight();//服务权重
                 int workerThreads =  entry.getValue().get(0).getWorkerThreads();//服务工作线程
 
@@ -185,7 +185,7 @@ public class RegisterCenter implements IRegisterCenter4Invoker, IRegisterCenter4
                 }
 
                 providerService.setServerIp(serverIp);
-                providerService.setServicePort(Integer.parseInt(serverPort));
+                providerService.setServerPort(Integer.parseInt(serverPort));
                 providerService.setWeight(weight);
                 providerService.setWorkerThreads(workerThreads);
                 providerService.setGroupName(group);

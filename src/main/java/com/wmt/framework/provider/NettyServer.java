@@ -37,6 +37,12 @@ public class NettyServer {
      */
     private SerializeType serializeType = PropertyConfigeHelper.getSerializeType();
 
+    private NettyServer() {
+    }
+    public static NettyServer singleton() {
+        return nettyServer;
+    }
+
     /**
      * 启动Netty服务
      *
@@ -66,8 +72,29 @@ public class NettyServer {
 
                             //注册编码器NettyEncoderHandler
                             ch.pipeline().addLast(new NettyEncoderHandler(serializeType));
+
+                            //注册服务端业务逻辑处理器NettyServerInvokeHandler
+                            ch.pipeline().addLast(new NettyServerInvokeHandler());
                         }
                     });
+
+            try {
+                channel = serverBootstrap.bind(port).sync().channel();
+            } catch (InterruptedException e) {
+                new RuntimeException(e);
+            }
         }
+    }
+
+    /**
+     * 停止Netty服务
+     */
+    public void stop() {
+        if (null == channel) {
+            throw new RuntimeException("No Netty Server To Be Stoped");
+        }
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
+        channel.closeFuture().syncUninterruptibly();
     }
 }

@@ -7,6 +7,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 
 /**
+ * 将java对象序列化为字节数组
+ *
  * Created by weimiantong on 18/11/11.
  */
 public class NettyEncoderHandler extends MessageToByteEncoder{
