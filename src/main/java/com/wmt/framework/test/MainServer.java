@@ -1,5 +1,4 @@
 package com.wmt.framework.test;
-
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
