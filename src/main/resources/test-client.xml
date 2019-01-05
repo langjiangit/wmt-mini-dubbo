@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+
+
+    <!-- 客户端调用远程服务 -->
+    <bean id="remoteHelloService" class="com.wmt.framework.revoker.RevokerFactoryBean" lazy-init="false">
+        <property name="targetInterface" value="com.wmt.framework.test.HelloService"/>
+        <property name="clusterStrategy" value="WeightRandom"/>
+        <property name="remoteAppKey" value="ares"/>
+        <property name="groupName" value="default"/>
+        <property name="timeout" value="600"/>
+    </bean>
+
+</beans>

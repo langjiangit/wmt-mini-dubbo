@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+<beans>
+
+    <!-- 将userService暴露为远程服务 -->
+    <bean class="com.wmt.framework.provider.ProviderFactoryBean" lazy-init="false">
+        <property name="serviceItf" value="com.wmt.framework.test.HelloService"/>
+        <property name="serviceObject" value="com.wmt.framework.test.HelloServiceImpl"/>
+        <property name="appKey" value="ares"/>
+        <property name="weight" value="2"/>
+        <property name="groupName" value="default"/>
+        <property name="workerThreads" value="11"/>
+        <property name="serverPort" value="8081"/>
+        <property name="timeout" value="600"/>
+    </bean>
+</beans>

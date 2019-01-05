@@ -97,4 +97,76 @@ public class ProviderFactoryBean implements FactoryBean, InitializingBean {
         }
         return providerList;
     }
+
+    public Class<?> getServiceItf() {
+        return serviceItf;
+    }
+
+    public void setServiceItf(Class<?> serviceItf) {
+        this.serviceItf = serviceItf;
+    }
+
+    public Object getServiceObject() {
+        return serviceObject;
+    }
+
+    public void setServiceObject(Object serviceObject) {
+        this.serviceObject = serviceObject;
+    }
+
+    public String getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(String serverPort) {
+        this.serverPort = serverPort;
+    }
+
+    public long getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+
+    public Object getServiceProxyObject() {
+        return serviceProxyObject;
+    }
+
+    public void setServiceProxyObject(Object serviceProxyObject) {
+        this.serviceProxyObject = serviceProxyObject;
+    }
+
+    public String getAppKey() {
+        return appKey;
+    }
+
+    public void setAppKey(String appKey) {
+        this.appKey = appKey;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public int getWorkerThreads() {
+        return workerThreads;
+    }
+
+    public void setWorkerThreads(int workerThreads) {
+        this.workerThreads = workerThreads;
+    }
 }

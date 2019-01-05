@@ -43,7 +43,7 @@ public class RegisterCenter implements IRegisterCenter4Invoker, IRegisterCenter4
     private static String ZK_SERVICE = PropertyConfigeHelper.getZkService();
     private static int ZK_SESSION_TIME_OUT = PropertyConfigeHelper.getZkConnectionTimeout();
     private static int ZK_CONNECTION_TIME_OUT = PropertyConfigeHelper.getZkConnectionTimeout();
-    private static String ROOT_PATH = "/config_register";
+    private static String ROOT_PATH = "/zk_demo/config_register";
     public static String PROVIDER_TYPE = "provider";
     public static String INVOKER_TYPE = "consumer";
     private static volatile ZkClient zkClient = null;
