@@ -104,7 +104,8 @@ public class RegisterCenter implements IRegisterCenter4Invoker, IRegisterCenter4
                 exist = zkClient.exists(currentServiceIpNode);
                 if(!exist) {
                     //注意,这里创建的是临时节点
-                    zkClient.createEphemeral(currentServiceIpNode);
+                    //  zkClient.createEphemeral(currentServiceIpNode);zookeeper-3.4.10 以及以下版本 创建临时节点时必须写入数据, 否则无法创建成功
+                    zkClient.createEphemeral(currentServiceIpNode, "Just Need Some Data");
                 }
 
                 //监听注册服务的变化,同时更新数据到本地缓存

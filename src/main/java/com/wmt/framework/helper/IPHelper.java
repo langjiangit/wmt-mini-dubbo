@@ -9,7 +9,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 /**
- * @author liyebing created on 17/1/30.
+ * @author weimiantong created on 17/1/30.
  * @version $Id$
  */
 public class IPHelper {

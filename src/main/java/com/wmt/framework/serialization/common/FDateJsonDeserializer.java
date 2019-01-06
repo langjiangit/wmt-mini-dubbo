@@ -14,7 +14,7 @@ import java.util.Date;
 
 
 /**
- * @author liyebing created on 17/1/21.
+ * @author weimiantong created on 17/1/21.
  * @version $Id$
  */
 public class FDateJsonDeserializer extends JsonDeserializer<Date> {

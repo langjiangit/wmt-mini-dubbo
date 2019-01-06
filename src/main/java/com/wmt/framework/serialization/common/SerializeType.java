@@ -2,7 +2,7 @@ package com.wmt.framework.serialization.common;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- * @author liyebing created on 17/2/11.
+ * @author weimiantong created on 17/2/11.
  * @version $Id$
  */
 public enum SerializeType {

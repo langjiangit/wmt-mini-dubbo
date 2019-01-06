@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.Date;
 
 /**
- * @author liyebing created on 17/1/21.
+ * @author weimiantong created on 17/1/21.
  * @version $Id$
  */
 public class FDateJsonSerializer extends JsonSerializer<Date> {

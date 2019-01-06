@@ -7,7 +7,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 /**
- * @author liyebing created on 17/2/13.
+ * @author weimiantong created on 17/2/13.
  * @version $Id$
  */
 public class HessianInvokerClient {

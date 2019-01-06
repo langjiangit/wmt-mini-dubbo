@@ -3,7 +3,7 @@ package com.wmt.framework.test.common;
 import java.io.Serializable;
 
 /**
- * @author liyebing created on 17/2/12.
+ * @author weimiantong created on 17/2/12.
  * @version $Id$
  */
 public class User implements Serializable {

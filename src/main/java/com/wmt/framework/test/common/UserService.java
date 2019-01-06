@@ -1,7 +1,7 @@
 package com.wmt.framework.test.common;
 
 /**
- * @author liyebing created on 17/2/12.
+ * @author weimiantong created on 17/2/12.
  * @version $Id$
  */
 

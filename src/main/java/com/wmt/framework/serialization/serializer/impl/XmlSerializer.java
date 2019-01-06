@@ -6,7 +6,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.wmt.framework.serialization.serializer.ISerializer;
 
 /**
- * @author liyebing created on 17/1/21.
+ * @author weimiantong created on 17/1/21.
  * @version $Id$
  */
 public class XmlSerializer implements ISerializer {

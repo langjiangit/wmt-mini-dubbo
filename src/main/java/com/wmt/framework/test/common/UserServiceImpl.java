@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author liyebing created on 17/2/12.
+ * @author weimiantong created on 17/2/12.
  * @version $Id$
  */
 @Service("userService")
@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService {
 
     static {
         userMap.put("kongxuan", new User("kongxuan", "kongxuan@163.com"));
-        userMap.put("liyebing", new User("liyebing", "liyebing@163.com"));
+        userMap.put("weimiantong", new User("weimiantong", "weimiantong@163.com"));
     }
 
     @Override
