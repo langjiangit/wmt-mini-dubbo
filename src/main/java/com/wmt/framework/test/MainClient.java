@@ -17,15 +17,12 @@ public class MainClient {
     public static void main(String[] args) throws Exception {
 
         //引入远程服务
-//        final ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("hessian-rpc-client.xml");
         final ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("test-client.xml");
 
         //获取远程服务
-        final HelloService helloService = (HelloService) context.getBean("remoteHelloService");
-     // final HelloService helloService = (HelloService) context.getBean("userServiceHessianProxy");
+        HelloService helloService = (HelloService) context.getBean("remoteHelloService");
 
-
-        long count = 1000000000000000000L;
+        long count = 1000L;
 
         //调用服务并打印结果
         for (int i = 0; i < count; i++) {

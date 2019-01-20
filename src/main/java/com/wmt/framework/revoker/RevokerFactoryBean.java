@@ -90,6 +90,9 @@ public class RevokerFactoryBean implements FactoryBean, InitializingBean{
     public void setTargetInterface(Class<?> targetInterface) {
         this.targetInterface = targetInterface;
     }
+    public void getTargetInterface(Class<?> targetInterface) {
+        this.targetInterface = targetInterface;
+    }
 
     public int getTimeout() {
         return timeout;

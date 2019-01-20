@@ -12,4 +12,6 @@
         <property name="timeout" value="600"/>
     </bean>
 
+    <bean id="helloService" class="com.wmt.framework.test.HelloServiceImpl"/>
+
 </beans>

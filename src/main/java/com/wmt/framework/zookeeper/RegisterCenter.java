@@ -104,7 +104,7 @@ public class RegisterCenter implements IRegisterCenter4Invoker, IRegisterCenter4
                 exist = zkClient.exists(currentServiceIpNode);
                 if(!exist) {
                     //注意,这里创建的是临时节点
-                    //  zkClient.createEphemeral(currentServiceIpNode);zookeeper-3.4.10 以及以下版本 创建临时节点时必须写入数据, 否则无法创建成功
+                    //zkClient.createEphemeral(currentServiceIpNode);//zookeeper-3.4.10 以及以下版本 创建临时节点时必须写入数据, 否则无法创建成功
                     zkClient.createEphemeral(currentServiceIpNode, "Just Need Some Data");
                 }
 
@@ -144,12 +144,45 @@ public class RegisterCenter implements IRegisterCenter4Invoker, IRegisterCenter4
     }
     @Override
     public Map<String, List<ProviderService>> getServiceMetaDataMap4Consume() {
-        return null;
+        return serviceMetaDataMap4Consume;
     }
 
     @Override
     public void registerInvoker(InvokerService invoker) {
+        if (invoker == null) {
+            return;
+        }
 
+        //连接zk,注册服务
+        synchronized (RegisterCenter.class) {
+            if (zkClient == null) {
+                zkClient = new ZkClient(ZK_SERVICE, ZK_SESSION_TIME_OUT, ZK_CONNECTION_TIME_OUT, new SerializableSerializer());
+            }
+            //创建 ZK命名空间/当前部署应用APP命名空间/
+            boolean exist = zkClient.exists(ROOT_PATH);
+            if (!exist) {
+                zkClient.createPersistent(ROOT_PATH, true);
+            }
+
+            //创建服务消费者节点
+            String remoteAppKey = invoker.getRemoteAppKey();
+            String groupName = invoker.getGroupName();
+            String serviceNode = invoker.getServiceItf().getName();
+            String servicePath = ROOT_PATH + "/" + remoteAppKey + "/" + groupName + "/" + serviceNode + "/" + INVOKER_TYPE;
+            exist = zkClient.exists(servicePath);
+            if (!exist) {
+                zkClient.createPersistent(servicePath, true);
+            }
+
+            //创建当前服务器节点
+            String localIp = IPHelper.localIp();
+            String currentServiceIpNode = servicePath + "/" + localIp;
+            exist = zkClient.exists(currentServiceIpNode);
+            if (!exist) {
+                //注意,这里创建的是临时节点
+                zkClient.createEphemeral(currentServiceIpNode);
+            }
+        }
     }
 
     private Map<String, List<ProviderService>> fetchOrUpdateServiceMetaData(String remoteAppKey, String groupName) {
