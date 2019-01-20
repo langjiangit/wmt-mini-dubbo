@@ -13,5 +13,5 @@ import java.util.Map;
  */
 public class ClusterEngine {
     private static final Map<ClusterStrategyEnum, ClusterStrategy> clusterStrategyMap = Maps.newConcurrentMap();
-    
+
 }
