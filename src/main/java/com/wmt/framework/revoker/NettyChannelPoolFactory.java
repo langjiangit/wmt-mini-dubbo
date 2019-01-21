@@ -154,7 +154,7 @@ public class NettyChannelPoolFactory {
      * @param socketAddress
      * @return
      */
-    private Channel registerChannel(InetSocketAddress socketAddress) {
+    public Channel registerChannel(InetSocketAddress socketAddress) {
         try {
             EventLoopGroup group = new NioEventLoopGroup(10);
             Bootstrap bootstrap = new Bootstrap();
