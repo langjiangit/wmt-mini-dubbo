@@ -3,6 +3,7 @@ package com.wmt.framework.revoker;
 import com.wmt.framework.cluster.ClusterStrategy;
 import com.wmt.framework.cluster.engine.ClusterEngine;
 import com.wmt.framework.model.AresRequest;
+import com.wmt.framework.model.AresResponse;
 import com.wmt.framework.model.ProviderService;
 import com.wmt.framework.zookeeper.IRegisterCenter4Invoker;
 import com.wmt.framework.zookeeper.RegisterCenter;
@@ -15,6 +16,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 消费端bean代理工厂
@@ -68,20 +71,30 @@ public class RevokerProxyBeanFactory implements InvocationHandler{
         //设置本次调用的方法参数信息
         request.setArgs(args);
 
-        if (fixedThreadPool == null) {
-            synchronized (RevokerProxyBeanFactory.class) {
-                if (null == fixedThreadPool) {
-                    fixedThreadPool = Executors.newFixedThreadPool(threadWorkerNumber);
+
+        try {
+            //构建用来发起调用的线程池
+            if (fixedThreadPool == null) {
+                synchronized (RevokerProxyBeanFactory.class) {
+                    if (null == fixedThreadPool) {
+                        fixedThreadPool = Executors.newFixedThreadPool(threadWorkerNumber);
+                    }
                 }
             }
+            //根据服务提供者的ip,port,构建InetSocketAddress对象,标识服务提供者地址
+            String serverIp = request.getProviderService().getServerIp();
+            int serverPort = request.getProviderService().getServerPort();
+            InetSocketAddress inetSocketAddress = new InetSocketAddress(serverIp, serverPort);
+            //提交本次调用信息到线程池fixedThreadPool,发起调用
+            Future<AresResponse> responseFuture = fixedThreadPool.submit(RevokerServiceCallable.of(inetSocketAddress, request));
+            //获取调用的返回结果
+            AresResponse response = responseFuture.get(request.getInvokeTimeout(), TimeUnit.MILLISECONDS);
+            if (response != null) {
+                return response.getResult();
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        //根据服务提供者的ip,port,构建InetSocketAddress对象,标识服务提供者地址
-        String serverIp = request.getProviderService().getServerIp();
-        int serverPort = request.getProviderService().getServerPort();
-        InetSocketAddress inetSocketAddress = new InetSocketAddress(serverIp, serverPort);
-        //提交本次调用信息到线程池fixedThreadPool,发起调用
-
-
         return null;
     }
 
