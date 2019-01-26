@@ -69,7 +69,7 @@ public class NettyChannelPoolFactory {
             if (CollectionUtils.isEmpty(serviceMetaDataModels)) {
                 continue;
             }
-            serviceMetaDataModels.addAll(serviceMetaDataModels);
+            serviceMetaDataList.addAll(serviceMetaDataModels);
         }
 
         //获取服务提供者地址列表

@@ -1,15 +1,25 @@
 package com.wmt.framework.provider;
 
+import avro.shaded.com.google.common.base.Predicate;
+import avro.shaded.com.google.common.collect.Collections2;
 import avro.shaded.com.google.common.collect.Maps;
+import com.alibaba.fastjson.JSON;
 import com.wmt.framework.model.AresRequest;
+import com.wmt.framework.model.AresResponse;
 import com.wmt.framework.model.ProviderService;
+import com.wmt.framework.zookeeper.IRegisterCenter4Provider;
+import com.wmt.framework.zookeeper.RegisterCenter;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 处理服务端的逻辑  根据解码得到的Java请求对象确定服务提供者的接口以及方法,然后反射发起调用
@@ -61,7 +71,44 @@ public class NettyServerInvokeHandler extends SimpleChannelInboundHandler<AresRe
                 }
             }
 
+            //获取注册中心服务
+            IRegisterCenter4Provider registerCenter4Provider = RegisterCenter.singleton();
+            List<ProviderService> localProviderCaches = registerCenter4Provider.getProviderServiceMap().get(serviceKey);
 
+            Object result = null;
+            boolean acquire = false;
+
+            try {
+                ProviderService localProviderCache = Collections2.filter(localProviderCaches, new Predicate<ProviderService>() {
+                    @Override
+                    public boolean apply(ProviderService providerService) {
+                        return StringUtils.equals(providerService.getServiceMethod().getName(), methodName);
+                    }
+                }).iterator().next();
+                Object serviceObject = localProviderCache.getServiceObject();
+
+                //利用反射发起服务调用
+                Method method = localProviderCache.getServiceMethod();
+                //利用semaphore实现限流
+                acquire = semaphore.tryAcquire(consumeTimeOut, TimeUnit.MILLISECONDS);
+                if (acquire) {
+                    result = method.invoke(serviceObject, request.getArgs());
+                }
+            } catch (Exception e) {
+                System.out.println(JSON.toJSONString(localProviderCaches) + "  " + methodName+" "+e.getMessage());
+                result = e;
+            } finally {
+                if (acquire) {
+                    semaphore.release();
+                }
+            }
+
+            //根据服务调用结果组装调用返回对象
+            AresResponse response = new AresResponse();
+            response.setInvokeTimeout(consumeTimeOut);
+            response.setUniqueKey(request.getUniqueKey());
+            response.setResult(result);
+            ctx.writeAndFlush(response);
         } else {
             logger.error("------------channel closed!---------------");
         }
