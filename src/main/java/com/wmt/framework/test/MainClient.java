@@ -22,7 +22,7 @@ public class MainClient {
         //获取远程服务
         HelloService helloService = (HelloService) context.getBean("remoteHelloService");
 
-        long count = 6L;
+        long count = 1000L;
 
         //调用服务并打印结果
         for (int i = 0; i < count; i++) {

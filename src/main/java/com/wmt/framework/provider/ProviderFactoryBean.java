@@ -12,6 +12,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
+ * 服务Bean发布入口
+ *
  * Created by weimiantong on 18/11/11.
  */
 public class ProviderFactoryBean implements FactoryBean, InitializingBean {
@@ -80,6 +82,7 @@ public class ProviderFactoryBean implements FactoryBean, InitializingBean {
 
     private List<ProviderService> buildProviderServiceInfos() {
         List<ProviderService> providerList = Lists.newArrayList();
+//        serviceObject = new HelloServiceImpl();// TODO: 19/1/26
         Method[] methods = serviceObject.getClass().getDeclaredMethods();
         for (Method method : methods) {
             ProviderService providerService = new ProviderService();
@@ -93,6 +96,10 @@ public class ProviderFactoryBean implements FactoryBean, InitializingBean {
             providerService.setWorkerThreads(workerThreads);
             providerService.setAppKey(appKey);
             providerService.setGroupName(groupName);
+            // TODO: 19/1/26
+            if (method.getName().contains("sayHello")) {
+                System.out.println(providerService);
+            }
             providerList.add(providerService);
         }
         return providerList;

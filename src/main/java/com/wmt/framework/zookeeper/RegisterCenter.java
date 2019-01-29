@@ -217,7 +217,6 @@ public class RegisterCenter implements IRegisterCenter4Invoker, IRegisterCenter4
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
-
                 providerService.setServerIp(serverIp);
                 providerService.setServerPort(Integer.parseInt(serverPort));
                 providerService.setWeight(weight);

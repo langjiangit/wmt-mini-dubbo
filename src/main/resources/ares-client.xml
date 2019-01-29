@@ -8,7 +8,7 @@
 
     <!-- 引入远程服务 -->
     <AresClient:reference id="remoteHelloService"
-                          interface=" com.wmt.framework.test.HelloService"
+                          interface="com.wmt.framework.test.HelloService"
                           clusterStrategy="WeightRandom"
                           remoteAppKey="ares"
                           groupName="default"

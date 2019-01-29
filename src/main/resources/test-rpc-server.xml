@@ -3,9 +3,10 @@
 <beans>
 
     <!-- 将userService暴露为远程服务 -->
+    <bean id="helloService" class="com.wmt.framework.test.HelloServiceImpl"/>
     <bean class="com.wmt.framework.provider.ProviderFactoryBean" lazy-init="false">
         <property name="serviceItf" value="com.wmt.framework.test.HelloService"/>
-        <property name="serviceObject" value="com.wmt.framework.test.HelloServiceImpl"/>
+        <property name="serviceObject" value="helloService"/>
         <property name="appKey" value="ares"/>
         <property name="weight" value="2"/>
         <property name="groupName" value="default"/>
